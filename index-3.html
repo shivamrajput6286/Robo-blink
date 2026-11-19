@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoboBlink — Robotics & IoT Delivery in 20-30 min</title>
+<style>
+:root{--y:#f8d548;--g:#0c831f;--bg:#f4f5f7;--card:#fff;--ink:#1c1c1e;--muted:#7a7d85;--r:16px}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif}
+body{background:var(--bg);color:var(--ink);padding-bottom:90px}
+header{position:sticky;top:0;z-index:50;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.topbar{max-width:1100px;margin:auto;display:flex;align-items:center;gap:14px;padding:10px 16px;flex-wrap:wrap}
+.logo{font-size:22px;font-weight:800;color:var(--g);display:flex;align-items:center;gap:6px}
+.logo span{background:var(--y);color:#222;border-radius:8px;padding:1px 7px}
+.badge20{background:#e7f6ea;color:var(--g);font-weight:700;font-size:12px;padding:4px 10px;border-radius:20px;border:1px solid #bfe6c6}
+.search{flex:1;min-width:200px;position:relative}
+.search input{width:100%;padding:11px 14px 11px 38px;border:1.5px solid #e2e4e8;border-radius:12px;font-size:14px;outline:none;background:#f6f7f9}
+.search input:focus{border-color:var(--g);background:#fff}
+.search::before{content:"🔍";position:absolute;left:12px;top:9px;font-size:14px}
+.loginbtn{background:var(--y);border:none;padding:10px 18px;border-radius:12px;font-weight:700;cursor:pointer;font-size:14px}
+.loginbtn:hover{filter:brightness(.95)}
+.chips{max-width:1100px;margin:auto;display:flex;gap:8px;overflow-x:auto;padding:6px 16px 12px}
+.chip{white-space:nowrap;background:#fff;border:1.5px solid #e2e4e8;border-radius:20px;padding:7px 14px;cursor:pointer;font-size:13px;font-weight:600}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.hero{max-width:1100px;margin:14px auto;background:linear-gradient(100deg,#0c831f,#12b832);border-radius:20px;color:#fff;padding:22px 26px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.hero h1{font-size:24px}
+.hero p{opacity:.9;font-size:14px;margin-top:4px}
+.timer{background:#fff;color:var(--g);font-weight:800;border-radius:14px;padding:10px 18px;font-size:18px}
+.grid{max-width:1100px;margin:16px auto;padding:0 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+.card{background:var(--card);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;box-shadow:0 1px 4px rgba(0,0,0,.05);transition:.15s}
+.card:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(0,0,0,.1)}
+.thumb{font-size:44px;text-align:center;background:#f2f6f3;border-radius:12px;padding:16px 0}
+.card h3{font-size:13.5px;margin:8px 0 2px;line-height:1.3;min-height:34px}
+.cat{font-size:11px;color:var(--muted)}
+.prow{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.price{font-weight:800;font-size:15px}
+.mrp{color:var(--muted);text-decoration:line-through;font-size:11.5px;font-weight:400;margin-left:4px}
+.add{background:#e7f6ea;color:var(--g);border:1.5px solid var(--g);border-radius:10px;padding:6px 14px;font-weight:800;cursor:pointer}
+.add.in{background:var(--g);color:#fff}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;opacity:0;transition:.3s;z-index:99}
+.toast.show{opacity:1}
+/* cart bar */
+.cartbar{position:fixed;bottom:0;left:0;right:0;background:var(--ink);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:14px 20px;z-index:60;transform:translateY(100%);transition:.25s}
+.cartbar.show{transform:translateY(0)}
+.cartbar button{background:var(--g);border:none;color:#fff;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer}
+/* drawer */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:.25s;z-index:70}
+.overlay.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:-420px;width:400px;max-width:92vw;height:100%;background:#fff;z-index:80;transition:.28s;display:flex;flex-direction:column}
+.drawer.show{right:0}
+.dhead{padding:16px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:18px}
+.dbody{flex:1;overflow-y:auto;padding:12px 16px}
+.ditem{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px dashed #eee}
+.ditem .thumb{font-size:28px;padding:8px;width:60px;flex-shrink:0}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:26px;height:26px;border:1.5px solid var(--g);background:#e7f6ea;color:var(--g);border-radius:8px;font-weight:800;cursor:pointer}
+.dfoot{padding:16px;border-top:1px solid #eee}
+.rowline{display:flex;justify-content:space-between;font-size:13.5px;margin:4px 0;color:#444}
+.total{display:flex;justify-content:space-between;font-weight:800;font-size:16px;margin-top:8px}
+.checkout{width:100%;background:var(--g);color:#fff;border:none;padding:13px;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;margin-top:12px}
+/* modal */
+.modal{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5)}
+.modal.show{display:flex}
+.mbox{background:#fff;border-radius:20px;padding:28px;width:360px;max-width:92vw;text-align:center}
+.mbox h2{margin-bottom:6px}
+.mbox p{color:var(--muted);font-size:13px;margin-bottom:16px}
+.mbox input{width:100%;padding:12px;border:1.5px solid #e2e4e8;border-radius:12px;font-size:16px;text-align:center;letter-spacing:2px;margin-bottom:12px;outline:none}
+.mbox input:focus{border-color:var(--g)}
+.otpbox{background:#fffbe6;border:1.5px dashed #e6c94b;padding:10px;border-radius:12px;font-weight:700;margin-bottom:14px}
+.big{width:100%;background:var(--g);color:#fff;border:none;padding:13px;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer}
+.ghost{width:100%;background:none;border:none;color:var(--muted);padding:10px;cursor:pointer;margin-top:6px;font-size:13px}
+.err{color:#d33;font-size:12.5px;min-height:16px;margin-bottom:6px}
+/* tracking */
+.track{max-width:1100px;margin:14px auto;padding:0 16px;display:none}
+.trackcard{background:#fff;border-radius:20px;padding:22px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.steps{display:flex;justify-content:space-between;margin:20px 0 10px;position:relative}
+.steps::before{content:"";position:absolute;top:12px;left:6%;right:6%;height:4px;background:#e5e7ea;border-radius:4px}
+.step{position:relative;z-index:1;text-align:center;flex:1;font-size:11.5px;color:var(--muted)}
+.dot{width:26px;height:26px;border-radius:50%;background:#e5e7ea;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.step.done .dot{background:var(--g);color:#fff}
+.step.done{color:var(--g);font-weight:700}
+.countdown{font-size:34px;font-weight:800;color:var(--g)}
+@media(max-width:600px){.grid{grid-template-columns:repeat(2,1fr)}.hero h1{font-size:19px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="topbar">
+    <div class="logo">🤖 Robo<span>Blink</span></div>
+    <div class="badge20">⚡ Delivery in 20–30 minutes</div>
+    <div class="search"><input id="search" placeholder='Search "ESP32", "servo", "sensor"…' oninput="render()"></div>
+    <button class="loginbtn" id="loginBtn" onclick="openLogin()">Login</button>
+  </div>
+  <div class="chips" id="chips"></div>
+</header>
+
+<div class="hero">
+  <div>
+    <h1>Robotics & IoT parts, delivered in minutes 🚀</h1>
+    <p>Arduino • ESP32 • Raspberry Pi • Sensors • Motors • Modules — dark-store style instant delivery for makers.</p>
+  </div>
+  <div class="timer" id="heroTimer">20–30 min</div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="track" id="track">
+  <div class="trackcard">
+    <h2>Order #RB<span id="orderId"></span> — On the way 🛵</h2>
+    <p style="color:var(--muted);font-size:13px">Your robotics parts are being packed at the RoboBlink dark store near you.</p>
+    <div class="countdown" id="cd">25:00</div>
+    <div class="steps">
+      <div class="step done" id="s0"><div class="dot">✓</div>Order placed</div>
+      <div class="step" id="s1"><div class="dot">📦</div>Packed</div>
+      <div class="step" id="s2"><div class="dot">🛵</div>Out for delivery</div>
+      <div class="step" id="s3"><div class="dot">🏠</div>Delivered</div>
+    </div>
+  </div>
+</div>
+
+<div class="cartbar" id="cartbar">
+  <div><b id="cartQty">0</b> items · ₹<b id="cartSum">0</b></div>
+  <button onclick="openCart()">View Cart 🛒</button>
+</div>
+
+<div class="overlay" id="ov" onclick="closeAll()"></div>
+
+<div class="drawer" id="drawer">
+  <div class="dhead"><span>Your Cart</span><button onclick="closeAll()" style="border:none;background:none;font-size:20px;cursor:pointer">✕</button></div>
+  <div class="dbody" id="dbody"></div>
+  <div class="dfoot">
+    <div class="rowline"><span>Items total</span><span id="dSub">₹0</span></div>
+    <div class="rowline"><span>Delivery fee</span><span style="color:var(--g);font-weight:700">FREE</span></div>
+    <div class="rowline"><span>Handling</span><span>₹4</span></div>
+    <div class="total"><span>To pay</span><span id="dTot">₹0</span></div>
+    <button class="checkout" onclick="placeOrder()">Place Order → Track in 20–30 min</button>
+  </div>
+</div>
+
+<div class="modal" id="loginModal">
+  <div class="mbox">
+    <div id="stepPhone">
+      <h2>🤖 Login to RoboBlink</h2>
+      <p>Demo login — no real SMS is sent. OTP appears on screen.</p>
+      <input id="phone" type="tel" maxlength="10" placeholder="10-digit mobile number">
+      <div class="err" id="phoneErr"></div>
+      <button class="big" onclick="sendOtp()">Send OTP</button>
+    </div>
+    <div id="stepOtp" style="display:none">
+      <h2>Verify OTP</h2>
+      <p>Sent to +91 <span id="phShow"></span></p>
+      <div class="otpbox">Demo OTP: <b id="otpShow" style="font-size:18px;letter-spacing:3px"></b></div>
+      <input id="otp" maxlength="6" placeholder="Enter OTP" style="letter-spacing:6px">
+      <div class="err" id="otpErr"></div>
+      <button class="big" onclick="verifyOtp()">Verify & Login</button>
+      <button class="ghost" onclick="backToPhone()">← Change number</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const P=[
+// ---- Boards ----
+["Arduino Uno R3 (clone)",420,549,"Boards","🟩"],["Arduino Nano",230,320,"Boards","🟩"],["Arduino Mega 2560",780,999,"Boards","🟩"],
+["ESP32 DevKit V1 (WiFi+BT)",260,380,"Boards","📶"],["ESP8266 NodeMCU",190,260,"Boards","📶"],["ESP32-CAM with OV2640",420,550,"Boards","📷"],
+["Raspberry Pi 4 Model B 4GB",4800,5600,"Boards","🍓"],["Raspberry Pi Pico W",480,620,"Boards","🍓"],["STM32 Blue Pill",280,350,"Boards","🔷"],
+["ATtiny85 Mini Board",150,210,"Boards","🔩"],
+// ---- Sensors ----
+["DHT11 Temp/Humidity Sensor",80,120,"Sensors","🌡️"],["DHT22 (AM2302)",240,320,"Sensors","🌡️"],["HC-SR04 Ultrasonic Sensor",60,99,"Sensors","📡"],
+["IR Obstacle Sensor Module",40,70,"Sensors","🚧"],["PIR Motion Sensor HC-SR501",70,110,"Sensors","🚶"],["MQ-2 Gas/Smoke Sensor",90,140,"Sensors","💨"],
+["MQ-135 Air Quality Sensor",140,200,"Sensors","🌫️"],["MPU-6050 Gyro+Accelerometer",110,170,"Sensors","🌀"],["BMP180 Barometric Sensor",120,180,"Sensors","⛰️"],
+["LDR Light Sensor Module",30,50,"Sensors","🔆"],["Soil Moisture Sensor",50,90,"Sensors","🌱"],["Rain Drop Sensor Module",55,85,"Sensors","🌧️"],
+["Flame Sensor Module",60,95,"Sensors","🔥"],["Sound Sensor Module",55,90,"Sensors","🎤"],["Heartbeat Pulse Sensor",180,260,"Sensors","❤️"],
+["TCS3200 Color Sensor",220,300,"Sensors","🎨"],["GPS NEO-6M Module",480,650,"Sensors","🛰️"],
+// ---- Motors & Drivers ----
+["Bo Motor (200 RPM, pair)",140,200,"Motors","⚙️"],["N20 12V Micro Gear Motor",180,250,"Motors","⚙️"],["SG90 Servo Motor",90,140,"Motors","🦾"],
+["MG996R Metal Gear Servo",260,350,"Motors","🦾"],["NEMA 17 Stepper Motor",350,480,"Motors","🔄"],["A4988 Stepper Driver",90,140,"Motors","🧩"],
+["L298N Motor Driver Board",110,160,"Motors","🔌"],["L293D Motor Driver Shield",140,190,"Motors","🔌"],["TB6612FNG Driver",180,240,"Motors","🔌"],
+["DC Gear Motor + Wheel Kit (4)",320,450,"Motors","🛞"],
+// ---- Modules ----
+["HC-05 Bluetooth Module",180,260,"Modules","🔵"],["RFID RC522 Kit",130,190,"Modules","💳"],["4x4 Keypad Matrix",70,110,"Modules","⌨️"],
+["16x2 LCD with I2C",150,220,"Modules","🖥️"],["0.96\" OLED Display (I2C)",180,250,"Modules","🖥️"],["Nokia 5110 LCD",160,230,"Modules","🖥️"],
+["SIM800L GSM Module",260,350,"Modules","📞"],["Relay Module 4-Channel",150,210,"Modules","🔀"],["Buzzer Module (active)",25,45,"Modules","🔔"],
+["Joystick Module",70,110,"Modules,".replace(",",""),"🕹️"],["433MHz RF Tx-Rx Pair",80,120,"Modules","📻"],["Voice Recognition Module",780,950,"Modules","🗣️"],
+// ---- Power & Tools ----
+["9V Battery + Clip",45,70,"Power","🔋"],["18650 Battery Cell",120,170,"Power","🔋"],["TP4056 Li-Ion Charger",40,70,"Power","⚡"],
+["Buck Converter LM2596",80,120,"Power","⚡"],["12V 2A Power Adapter",180,240,"Power","🔌"],["Breadboard 830 Points",90,130,"Power","🍞"],
+["Jumper Wires (M-M, 40pc)",70,110,"Tools","🧵"],["Soldering Iron Kit 60W",350,480,"Tools","🔥"],["Multimeter DT830D",220,300,"Tools","📏"],
+["Screwdriver Set (32-in-1)",190,260,"Tools","🪛"],
+// ---- Kits ----
+["Arduino Starter Kit (60+ parts)",1450,1900,"Kits","🎁"],["Line Follower Robot Kit",750,950,"Kits","🤖"],["Obstacle Avoiding Bot Kit",850,1100,"Kits","🤖"],
+["IoT Smart Home Kit",1900,2400,"Kits","🏠"],["Drone Frame Kit F450",850,1100,"Kits","🚁"]
+];
+const CATS=["All","Boards","Sensors","Motors","Modules","Power","Tools","Kits"];
+let cat="All",q="",cart={},user=null,trackTimer=null,otp=null,pendingPhone="";
+
+const $=id=>document.getElementById(id);
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1600)}
+function money(n){return n.toLocaleString("en-IN")}
+function save(){localStorage.setItem("rb_cart",JSON.stringify(cart));if(user)localStorage.setItem("rb_user",JSON.stringify(user))}
+function load(){try{cart=JSON.parse(localStorage.getItem("rb_cart"))||{};user=JSON.parse(localStorage.getItem("rb_user"))}catch(e){cart={}}}
+
+function renderChips(){$("chips").innerHTML=CATS.map(c=>`<div class="chip ${c===cat?'on':''}" onclick="setCat('${c}')">${c}</div>`).join("")}
+function setCat(c){cat=c;renderChips();render()}
+
+function render(){
+  const list=P.filter(p=>(cat==="All"||p[3]===cat)&&(!q||p[0].toLowerCase().includes(q)||p[3].toLowerCase().includes(q)));
+  $("grid").innerHTML=list.map((p)=>{
+    const i=P.indexOf(p),n=cart[i]||0;
+    return `<div class="card"><div class="thumb">${p[4]}</div>
+    <h3>${p[0]}</h3><div class="cat">${p[3]} · 20–30 min ⚡</div>
+    <div class="prow"><div><span class="price">₹${money(p[1])}</span><span class="mrp">₹${p[2]}</span></div>
+    ${n?`<div class="qty"><button onclick="qty(${i},-1)">−</button><b>${n}</b><button onclick="qty(${i},1)">+</button></div>`
+      :`<button class="add" onclick="qty(${i},1)">ADD</button>`}</div></div>`
+  }).join("")||`<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px">No items found 😕</p>`;
+}
+
+function qty(i,d){
+  if(!user){openLogin();toast("Please login first 🔐");return}
+  cart[i]=(cart[i]||0)+d;if(cart[i]<=0)delete cart[i];save();render();updateBar();
+}
+function updateBar(){
+  const n=Object.values(cart).reduce((a,b)=>a+b,0),sum=Object.entries(cart).reduce((a,[i,q])=>a+P[i][1]*q,0);
+  $("cartQty").textContent=n;$("cartSum").textContent=money(sum);
+  $("cartbar").classList.toggle("show",n>0);
+  $("dbody").innerHTML=Object.entries(cart).map(([i,q])=>{const p=P[i][0];
+    return `<div class="ditem"><div class="thumb">${P[i][4]}</div><div style="flex:1"><b style="font-size:13px">${p}</b><br><span class="price">₹${money(P[i][1]*q)}</span></div>
+    <div class="qty"><button onclick="qty(${i},-1)">−</button><b>${q}</b><button onclick="qty(${i},1)">+</button></div></div>`}).join("");
+  $("dSub").textContent="₹"+money(sum);$("dTot").textContent="₹"+money(sum+4);
+}
+function openCart(){$("drawer").classList.add("show");$("ov").classList.add("show")}
+function closeAll(){$("drawer").classList.remove("show");$("ov").classList.remove("show")}
+
+/* ---------- Login (demo OTP) ---------- */
+function openLogin(){
+  if(user){if(confirm("Logged in as "+user.phone+". Logout?")){user=null;localStorage.removeItem("rb_user");$("loginBtn").textContent="Login"}return}
+  $("loginModal").classList.add("show");$("stepPhone").style.display="block";$("stepOtp").style.display="none";$("phoneErr").textContent="";
+}
+function sendOtp(){
+  const ph=$("phone").value.trim();
+  if(!/^[6-9]\d{9}$/.test(ph)){$("phoneErr").textContent="Enter a valid 10-digit Indian mobile number";return}
+  pendingPhone=ph;otp=String(Math.floor(1000+Math.random()*9000));
+  $("phShow").textContent=ph;$("otpShow").textContent=otp;
+  $("stepPhone").style.display="none";$("stepOtp").style.display="block";
+  toast("Demo OTP generated — shown on screen 📱");
+}
+function verifyOtp(){
+  if($("otp").value.trim()!==otp){$("otpErr").textContent="Wrong OTP, try again";return}
+  user={phone:pendingPhone};save();$("loginModal").classList.remove("show");
+  $("loginBtn").textContent="👤 "+pendingPhone.slice(0,2)+"xxxxx"+pendingPhone.slice(-2);
+  toast("Logged in! Start adding parts 🛠️");
+}
+function backToPhone(){$("stepOtp").style.display="none";$("stepPhone").style.display="block"}
+$("loginModal").addEventListener("click",e=>{if(e.target.id==="loginModal")$("loginModal").classList.remove("show")});
+
+/* ---------- Order + tracking ---------- */
+function placeOrder(){
+  const n=Object.values(cart).reduce((a,b)=>a+b,0);
+  if(!n)return toast("Cart is empty");
+  if(!user){closeAll();openLogin();return}
+  closeAll();
+  $("orderId").textContent=Math.floor(1000+Math.random()*9000);
+  $("grid").style.display="none";document.querySelector(".hero").style.display="none";
+  $("track").style.display="block";window.scrollTo({top:0,behavior:"smooth"});
+  let secs=25*60;const steps=["s0","s1","s2","s3"];
+  steps.forEach(s=>$(s).classList.remove("done"));
+  clearInterval(trackTimer);
+  trackTimer=setInterval(()=>{
+    secs--;const m=String(Math.floor(secs/60)).padStart(2,"0"),s=String(secs%60).padStart(2,"0");
+    $("cd").textContent=m+":"+s;
+    const pct=1-secs/(25*60);
+    steps.forEach((st,i)=>{if(pct>=(i+1)*0.25)$(st).classList.add("done")});
+    if(secs<=0){clearInterval(trackTimer);$("cd").textContent="Delivered 🎉";toast("Order delivered! Rate your parts ⭐")}
+  },1000);
+  toast("Order placed! Arriving in 20–30 min 🛵");
+  cart={};save();updateBar();render();
+}
+
+$("search").addEventListener("input",e=>{q=e.target.value.toLowerCase();render()});
+load();
+if(user)$("loginBtn").textContent="👤 "+user.phone.slice(0,2)+"xxxxx"+user.phone.slice(-2);
+renderChips();render();updateBar();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
